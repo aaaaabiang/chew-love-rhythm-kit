@@ -62,18 +62,21 @@ const DeviceDemo = () => {
           Experience how the Chewing Love system creates a gentle rhythm connection between family members during mealtime.
         </p>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 items-center">
           {/* Family Member Side */}
           <FamilyMember isChewing={familyChewing} />
           
           {/* Connection Visualization */}
-          <ConnectionVisualizer 
+          <div className="flex justify-center">
+            <ConnectionVisualizer 
             connected={connected} 
             familyIsChewing={familyChewing}
             elderIsChewing={elderChewing} 
             resonanceStrength={resonanceStrength}
             toggleConnection={toggleConnection} 
           />
+          </div>
+          
           
           {/* Elder Side */}
           <div className="md:col-start-2 md:col-end-3 md:row-start-1 md:row-end-2">
