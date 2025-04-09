@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 
@@ -20,9 +19,9 @@ const ConnectionVisualizer: React.FC<ConnectionVisualizerProps> = ({
   return (
     <>
       {/* Desktop Connection Visualization */}
-      <div className="hidden md:flex flex-col items-center justify-center">
+      <div className="hidden md:flex flex-col items-center justify-center w-full py-8 mx-auto max-w-md">
         {/* Connection Line */}
-        <div className="relative h-40 w-full flex items-center justify-center">
+        <div className="relative h-40 w-full flex items-center justify-center my-4">
           <motion.div 
             className="h-1 bg-gradient-to-r from-solarpunk-moss to-solarpunk-sky w-0"
             animate={{ 
@@ -130,9 +129,9 @@ const ConnectionVisualizer: React.FC<ConnectionVisualizerProps> = ({
 
         {/* Resonance Indicator */}
         {connected && (
-          <div className="mt-2 mb-4 text-center">
+          <div className="mt-2 mb-4 text-center w-full">
             <p className="text-sm text-gray-600 mb-1">Rhythm Resonance</p>
-            <div className="h-2 w-40 bg-gray-200 rounded-full overflow-hidden">
+            <div className="h-2 w-40 bg-gray-200 rounded-full overflow-hidden mx-auto">
               <motion.div 
                 className="h-full bg-gradient-to-r from-solarpunk-moss to-solarpunk-sky"
                 animate={{ width: `${resonanceStrength * 100}%` }}
