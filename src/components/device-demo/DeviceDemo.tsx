@@ -55,7 +55,7 @@ const DeviceDemo = () => {
   };
 
   return (
-    <section className="py-20 px-4 md:px-8 relative overflow-hidden">
+    <section id="device-demo" className="py-20 px-4 md:px-8 relative overflow-hidden">
       <div className="max-w-6xl mx-auto">
         <h2 className="text-4xl md:text-5xl font-bold mb-10 text-center">Interactive Demonstration</h2>
         <p className="text-xl text-center max-w-3xl mx-auto mb-16">

@@ -3,6 +3,12 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 const Hero = () => {
+  const scrollToSection = (id: string) => {
+    const section = document.getElementById(id);
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
   return (
     <section className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden py-20 px-4 md:px-8">
       {/* Background Blobs */}
@@ -56,6 +62,7 @@ const Hero = () => {
             className="bg-solarpunk-moss text-white px-8 py-3 rounded-full font-medium text-lg flex items-center gap-2 hover:bg-solarpunk-moss/90 transition-colors cursor-pointer"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.98 }}
+            onClick={() => scrollToSection('device-demo')}
           >
             Discover How It Works
           </motion.div>
@@ -63,6 +70,7 @@ const Hero = () => {
             className="bg-transparent border-2 border-solarpunk-terracotta text-solarpunk-terracotta px-8 py-3 rounded-full font-medium text-lg flex items-center gap-2 hover:bg-solarpunk-terracotta/10 transition-colors cursor-pointer"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.98 }}
+            onClick={() => scrollToSection('vision')}
           >
             Our Vision
           </motion.div>

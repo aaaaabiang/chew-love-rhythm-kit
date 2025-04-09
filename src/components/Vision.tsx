@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 const Vision = () => {
   return (
-    <section className="py-20 px-4 md:px-8 relative overflow-hidden">
+    <section id="vision" className="py-20 px-4 md:px-8 relative overflow-hidden">
       {/* Background decoration */}
       <motion.div 
         className="absolute top-0 right-0 w-full h-full opacity-5 pointer-events-none"
