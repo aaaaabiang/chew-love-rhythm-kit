@@ -6,9 +6,15 @@ interface ElderlyPersonProps {
   isChewing: boolean;
   connected: boolean;
   familyIsChewing: boolean;
+  resonanceStrength: number;
 }
 
-const ElderlyPerson: React.FC<ElderlyPersonProps> = ({ isChewing, connected, familyIsChewing }) => {
+const ElderlyPerson: React.FC<ElderlyPersonProps> = ({ 
+  isChewing, 
+  connected, 
+  familyIsChewing,
+  resonanceStrength
+}) => {
   return (
     <div className="flex flex-col items-center">
       <h3 className="text-2xl font-medium mb-6">Older Adult</h3>
@@ -19,6 +25,22 @@ const ElderlyPerson: React.FC<ElderlyPersonProps> = ({ isChewing, connected, fam
           animate={isChewing ? { y: [0, -5, 0] } : {}}
           transition={{ duration: 1 }}
         >
+          {/* Resonance Aura */}
+          {connected && resonanceStrength > 0.3 && (
+            <motion.div
+              className="absolute inset-0 rounded-3xl"
+              style={{
+                background: `radial-gradient(circle, rgba(129, 173, 200, ${resonanceStrength * 0.2}) 0%, rgba(129, 173, 200, 0) 70%)`,
+                zIndex: -1,
+              }}
+              animate={{
+                scale: [1, 1.1, 1],
+                opacity: [0.5, 0.8, 0.5],
+              }}
+              transition={{ duration: 3, repeat: Infinity }}
+            />
+          )}
+
           <div className="relative w-48 h-48 mx-auto">
             <svg viewBox="0 0 100 100" className="w-full h-full">
               <motion.path
@@ -59,9 +81,13 @@ const ElderlyPerson: React.FC<ElderlyPersonProps> = ({ isChewing, connected, fam
                 fill="none"
                 animate={isChewing || (connected && familyIsChewing) ? { 
                   opacity: [1, 0.6, 1],
-                  strokeWidth: [3, 4, 3] 
+                  strokeWidth: [3, 4 + resonanceStrength * 2, 3] 
                 } : {}}
-                transition={{ duration: 0.5, repeat: connected && familyIsChewing ? Infinity : 0, repeatType: "loop" }}
+                transition={{ 
+                  duration: 0.5, 
+                  repeat: connected && (isChewing || familyIsChewing) ? Infinity : 0, 
+                  repeatType: "loop" 
+                }}
               />
               <motion.circle 
                 cx="80" 
@@ -69,10 +95,15 @@ const ElderlyPerson: React.FC<ElderlyPersonProps> = ({ isChewing, connected, fam
                 r="4" 
                 fill="#81ADC8" 
                 animate={isChewing || (connected && familyIsChewing) ? { 
-                  r: [4, 5, 4],
-                  opacity: [1, 0.8, 1]
+                  r: [4, 5 + resonanceStrength * 2, 4],
+                  opacity: [1, 0.8, 1],
+                  fill: resonanceStrength > 0.5 ? ["#81ADC8", "#7FB069", "#81ADC8"] : ["#81ADC8"]
                 } : {}}
-                transition={{ duration: 0.5, repeat: connected && familyIsChewing ? Infinity : 0, repeatType: "loop" }}
+                transition={{ 
+                  duration: 0.5, 
+                  repeat: connected && (isChewing || familyIsChewing) ? Infinity : 0, 
+                  repeatType: "loop"
+                }}
               />
             </svg>
           </div>
@@ -83,7 +114,10 @@ const ElderlyPerson: React.FC<ElderlyPersonProps> = ({ isChewing, connected, fam
         <p className="mb-3 text-lg">Assisted chewing rhythm</p>
         <motion.div 
           className="inline-block h-4 bg-solarpunk-sky rounded-full"
-          animate={{ width: isChewing ? '80px' : '30px' }}
+          animate={{ 
+            width: isChewing ? '80px' : '30px',
+            backgroundColor: resonanceStrength > 0.7 && isChewing ? ["#81ADC8", "#7FB069", "#81ADC8"] : "#81ADC8"
+          }}
           transition={{ duration: 0.3 }}
         />
         {connected && familyIsChewing && !isChewing && (
@@ -93,6 +127,20 @@ const ElderlyPerson: React.FC<ElderlyPersonProps> = ({ isChewing, connected, fam
             transition={{ duration: 1.5, repeat: Infinity }}
           >
             Vibration guidance active
+          </motion.div>
+        )}
+        {connected && resonanceStrength > 0.6 && (
+          <motion.div 
+            className="block mt-2 text-sm font-medium"
+            style={{
+              background: "linear-gradient(90deg, #7FB069 0%, #81ADC8 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent"
+            }}
+            animate={{ opacity: [0.7, 1, 0.7] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            Rhythm resonance achieved
           </motion.div>
         )}
       </div>

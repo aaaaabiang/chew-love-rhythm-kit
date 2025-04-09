@@ -9,6 +9,7 @@ const DeviceDemo = () => {
   const [familyChewing, setFamilyChewing] = useState(false);
   const [elderChewing, setElderChewing] = useState(false);
   const [connected, setConnected] = useState(false);
+  const [resonanceStrength, setResonanceStrength] = useState(0);
   
   // Simulate family member chewing
   useEffect(() => {
@@ -20,7 +21,16 @@ const DeviceDemo = () => {
         if (connected) {
           setTimeout(() => {
             setElderChewing(true);
-            setTimeout(() => setElderChewing(false), 1000);
+            setResonanceStrength(prev => Math.min(prev + 0.2, 1)); // Build resonance with each synchronized chew
+            setTimeout(() => {
+              setElderChewing(false);
+              // Let resonance fade slowly if still connected
+              if (connected) {
+                setTimeout(() => {
+                  setResonanceStrength(prev => Math.max(prev - 0.1, 0));
+                }, 1000);
+              }
+            }, 1000);
           }, 300);
         }
       }, 1000);
@@ -29,9 +39,19 @@ const DeviceDemo = () => {
     return () => clearInterval(chewingInterval);
   }, [connected]);
 
+  // Reset resonance when disconnected
+  useEffect(() => {
+    if (!connected) {
+      setResonanceStrength(0);
+    }
+  }, [connected]);
+
   // Toggle connection
   const toggleConnection = () => {
     setConnected(!connected);
+    if (!connected) {
+      setResonanceStrength(0.1); // Start with a small resonance when connecting
+    }
   };
 
   return (
@@ -49,7 +69,9 @@ const DeviceDemo = () => {
           {/* Connection Visualization */}
           <ConnectionVisualizer 
             connected={connected} 
-            familyIsChewing={familyChewing} 
+            familyIsChewing={familyChewing}
+            elderIsChewing={elderChewing} 
+            resonanceStrength={resonanceStrength}
             toggleConnection={toggleConnection} 
           />
           
@@ -58,7 +80,8 @@ const DeviceDemo = () => {
             <ElderlyPerson 
               isChewing={elderChewing} 
               connected={connected} 
-              familyIsChewing={familyChewing} 
+              familyIsChewing={familyChewing}
+              resonanceStrength={resonanceStrength}
             />
           </div>
         </div>
