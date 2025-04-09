@@ -79,14 +79,12 @@ const DeviceDemo = () => {
           
           
           {/* Elder Side */}
-          <div className="md:col-start-2 md:col-end-3 md:row-start-1 md:row-end-2">
             <ElderlyPerson 
               isChewing={elderChewing} 
               connected={connected} 
               familyIsChewing={familyChewing}
               resonanceStrength={resonanceStrength}
             />
-          </div>
         </div>
         
         {/* Description Text */}
