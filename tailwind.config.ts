@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -24,6 +25,16 @@ export default {
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
+				solarpunk: {
+					leaf: '#7FB069',
+					moss: '#5C8D54',
+					seafoam: '#A7CAB1',
+					terracotta: '#D8836F',
+					ochre: '#E6B055',
+					sand: '#F5E4CF',
+					sky: '#81ADC8',
+					night: '#2A4151'
+				},
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
@@ -70,26 +81,46 @@ export default {
 			},
 			keyframes: {
 				'accordion-down': {
-					from: {
-						height: '0'
-					},
-					to: {
-						height: 'var(--radix-accordion-content-height)'
-					}
+					from: { height: '0' },
+					to: { height: 'var(--radix-accordion-content-height)' }
 				},
 				'accordion-up': {
-					from: {
-						height: 'var(--radix-accordion-content-height)'
-					},
-					to: {
-						height: '0'
-					}
+					from: { height: 'var(--radix-accordion-content-height)' },
+					to: { height: '0' }
+				},
+				'pulse-soft': {
+					'0%, 100%': { opacity: '1' },
+					'50%': { opacity: '0.7' }
+				},
+				'float': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-10px)' }
+				},
+				'wave': {
+					'0%': { transform: 'translateY(0)' },
+					'25%': { transform: 'translateY(-5px)' },
+					'50%': { transform: 'translateY(0)' },
+					'75%': { transform: 'translateY(5px)' },
+					'100%': { transform: 'translateY(0)' }
+				},
+				'chew': {
+					'0%': { transform: 'scaleY(1)' },
+					'50%': { transform: 'scaleY(0.9)' },
+					'100%': { transform: 'scaleY(1)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
-			}
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'pulse-soft': 'pulse-soft 3s ease-in-out infinite',
+				'float': 'float 6s ease-in-out infinite',
+				'wave': 'wave 2s ease-in-out infinite',
+				'chew': 'chew 1.2s ease-in-out infinite'
+			},
+			fontFamily: {
+				sans: ['Quicksand', 'sans-serif'],
+				display: ['Montserrat Alternates', 'sans-serif']
+			},
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
