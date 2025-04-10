@@ -1,28 +1,29 @@
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { ChartContainer, ChartTooltipContent, ChartTooltip } from '@/components/ui/chart';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { FamilyMember, ChewingData } from '@/types';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { format, subDays, parseISO } from 'date-fns';
+import { format, subDays } from 'date-fns';
 
 const Dashboard = () => {
-  const [selectedMember, setSelectedMember] = useState<string | null>(null);
+  const [selectedElder, setSelectedElder] = useState<string | null>(null);
+  const [selectedFamilyFilter, setSelectedFamilyFilter] = useState<string>('all');
   const [timeRange, setTimeRange] = useState<'daily' | 'weekly' | 'monthly'>('daily');
 
-  // Fetch family members
+  // Fetch all family members
   const { data: familyMembers, isLoading: loadingMembers } = useQuery({
     queryKey: ['familyMembers'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('family_members')
         .select('*')
-        .order('relationship', { ascending: false }) // This will put 'elder' first if sorted alphabetically
+        .order('relationship', { ascending: false })
         .order('name');
 
       if (error) throw error;
@@ -40,36 +41,51 @@ const Dashboard = () => {
       member.relationship.toLowerCase() === 'older adult'
     );
     
-    // If we have fewer than 2 elders, we'll just return what we have
-    return elders.slice(0, 2); // Only take the first two elders
+    // Take up to 2 elders to show in the nav
+    return elders.slice(0, 2); 
   }, [familyMembers]);
 
-  // Set initial selected member when data loads - prioritize elders
-  useEffect(() => {
-    if (elderMembers.length && !selectedMember) {
-      setSelectedMember(elderMembers[0].id);
-    } else if (familyMembers?.length && !selectedMember) {
-      setSelectedMember(familyMembers[0].id);
-    }
-  }, [elderMembers, familyMembers, selectedMember]);
+  // Non-elder family members for the dropdown filter
+  const familyFilters = React.useMemo(() => {
+    if (!familyMembers) return [];
+    
+    return familyMembers.filter(member => 
+      member.relationship.toLowerCase() !== 'elder' && 
+      member.relationship.toLowerCase() !== 'elderly' && 
+      member.relationship.toLowerCase() !== 'older adult'
+    );
+  }, [familyMembers]);
 
-  // Fetch chewing data for selected member
+  // Set initial selected elder when data loads
+  useEffect(() => {
+    if (elderMembers.length && !selectedElder) {
+      setSelectedElder(elderMembers[0].id);
+    }
+  }, [elderMembers, selectedElder]);
+
+  // Fetch chewing data for selected elder
   const { data: chewingData, isLoading: loadingChewingData } = useQuery({
-    queryKey: ['chewingData', selectedMember, timeRange],
+    queryKey: ['chewingData', selectedElder, selectedFamilyFilter, timeRange],
     queryFn: async () => {
-      if (!selectedMember) return [];
+      if (!selectedElder) return [];
 
       // Calculate date range based on selected time range
       let daysLookback = 7;
       if (timeRange === 'weekly') daysLookback = 28;
       if (timeRange === 'monthly') daysLookback = 90;
 
-      const { data, error } = await supabase
+      let query = supabase
         .from('chewing_data')
         .select('*')
-        .eq('family_member_id', selectedMember)
+        .eq('family_member_id', selectedElder)
         .gte('date', format(subDays(new Date(), daysLookback), 'yyyy-MM-dd'))
         .order('date', { ascending: true });
+      
+      // If we're filtering by a specific family member interaction, we would add that filter here
+      // Note: This assumes there's a way to filter by family member in your schema
+      // You may need to adjust this based on your actual data model
+      
+      const { data, error } = await query;
 
       if (error) throw error;
       
@@ -84,7 +100,7 @@ const Dashboard = () => {
       
       return processedData;
     },
-    enabled: !!selectedMember,
+    enabled: !!selectedElder,
   });
 
   const chartData = React.useMemo(() => {
@@ -121,10 +137,10 @@ const Dashboard = () => {
     return Math.round(sum / chewingData.length);
   }, [chewingData]);
 
-  const selectedMemberDetails = React.useMemo(() => {
-    if (!familyMembers || !selectedMember) return null;
-    return familyMembers.find(member => member.id === selectedMember);
-  }, [familyMembers, selectedMember]);
+  const selectedElderDetails = React.useMemo(() => {
+    if (!familyMembers || !selectedElder) return null;
+    return familyMembers.find(member => member.id === selectedElder);
+  }, [familyMembers, selectedElder]);
 
   return (
     <DashboardLayout>
@@ -137,28 +153,18 @@ const Dashboard = () => {
 
           {!loadingMembers && (
             <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
-              <Select 
-                value={selectedMember || undefined} 
-                onValueChange={(value) => setSelectedMember(value)}
+              <Select
+                value={selectedFamilyFilter} 
+                onValueChange={(value) => setSelectedFamilyFilter(value)}
               >
                 <SelectTrigger className="w-full md:w-[200px]">
-                  <SelectValue placeholder="Select family member" />
+                  <SelectValue placeholder="Filter by interaction" />
                 </SelectTrigger>
                 <SelectContent>
-                  {/* All family members in dropdown */}
-                  {familyMembers?.map((member) => (
-                    <SelectItem 
-                      key={member.id} 
-                      value={member.id}
-                      className={member.relationship.toLowerCase() === 'elder' || 
-                               member.relationship.toLowerCase() === 'elderly' || 
-                               member.relationship.toLowerCase() === 'older adult' 
-                               ? "font-medium" : ""}
-                    >
-                      {member.name} ({member.relationship})
-                      {(member.relationship.toLowerCase() === 'elder' || 
-                        member.relationship.toLowerCase() === 'elderly' || 
-                        member.relationship.toLowerCase() === 'older adult') && " ⭐"}
+                  <SelectItem value="all">All Interactions</SelectItem>
+                  {familyFilters.map((member) => (
+                    <SelectItem key={member.id} value={member.id}>
+                      With {member.name} ({member.relationship})
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -169,7 +175,7 @@ const Dashboard = () => {
                 onValueChange={(value: 'daily' | 'weekly' | 'monthly') => setTimeRange(value)}
               >
                 <SelectTrigger className="w-full md:w-[150px]">
-                  <SelectValue placeholder="Select time range" />
+                  <SelectValue placeholder="Time range" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="daily">Daily</SelectItem>
@@ -190,9 +196,9 @@ const Dashboard = () => {
                 <Card 
                   key={elder.id}
                   className={`cursor-pointer transition-all w-full sm:w-64 ${
-                    selectedMember === elder.id ? 'ring-2 ring-solarpunk-leaf bg-solarpunk-seafoam/10' : ''
+                    selectedElder === elder.id ? 'ring-2 ring-solarpunk-leaf bg-solarpunk-seafoam/10' : ''
                   } border-solarpunk-leaf border-2`}
-                  onClick={() => setSelectedMember(elder.id)}
+                  onClick={() => setSelectedElder(elder.id)}
                 >
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg">
@@ -209,6 +215,7 @@ const Dashboard = () => {
                         </div>
                       </div>
                     </CardTitle>
+                    <CardDescription>{elder.relationship}</CardDescription>
                   </CardHeader>
                 </Card>
               ))}
@@ -220,7 +227,12 @@ const Dashboard = () => {
         <Card>
           <CardHeader>
             <CardTitle>
-              Chewing Activity {selectedMemberDetails ? `- ${selectedMemberDetails.name}` : ''}
+              {selectedElderDetails ? `${selectedElderDetails.name}'s Chewing Activity` : 'Chewing Activity'}
+              {selectedFamilyFilter !== 'all' && familyMembers && (
+                <span className="text-sm font-normal ml-2">
+                  with {familyMembers.find(m => m.id === selectedFamilyFilter)?.name || ''}
+                </span>
+              )}
             </CardTitle>
             <CardDescription>
               {timeRange === 'daily' && 'Daily chewing count for the past week'}
@@ -232,10 +244,10 @@ const Dashboard = () => {
             {loadingChewingData ? (
               <div className="h-96 bg-slate-100 animate-pulse rounded"></div>
             ) : chartData.length > 0 ? (
-              <div className="h-[400px] w-full"> {/* Adjusted height for better visualization */}
+              <div className="h-96 w-full"> {/* Keeps the increased height */}
                 <ChartContainer
                   config={getChartConfig()}
-                  className="w-full aspect-[16/9]" /* Wider aspect ratio for better fit */
+                  className="w-full aspect-[3/2]" /* Keeps the better aspect ratio */
                 >
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart
