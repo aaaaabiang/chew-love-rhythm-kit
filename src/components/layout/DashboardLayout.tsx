@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { BarChart3, Users, Home, Settings } from 'lucide-react';
+import { BarChart3, Users, Home, Settings, Database } from 'lucide-react';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
