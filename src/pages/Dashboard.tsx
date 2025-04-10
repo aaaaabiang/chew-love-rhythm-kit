@@ -30,17 +30,28 @@ const Dashboard = () => {
     },
   });
 
+  // Find elder members for the navigation section
+  const elderMembers = React.useMemo(() => {
+    if (!familyMembers) return [];
+    
+    const elders = familyMembers.filter(member => 
+      member.relationship.toLowerCase() === 'elder' || 
+      member.relationship.toLowerCase() === 'elderly' || 
+      member.relationship.toLowerCase() === 'older adult'
+    );
+    
+    // If we have fewer than 2 elders, we'll just return what we have
+    return elders.slice(0, 2); // Only take the first two elders
+  }, [familyMembers]);
+
   // Set initial selected member when data loads - prioritize elders
   useEffect(() => {
-    if (familyMembers?.length && !selectedMember) {
-      const elderMember = familyMembers.find(m => 
-        m.relationship.toLowerCase() === 'elder' || 
-        m.relationship.toLowerCase() === 'elderly' || 
-        m.relationship.toLowerCase() === 'older adult'
-      );
-      setSelectedMember(elderMember?.id || familyMembers[0].id);
+    if (elderMembers.length && !selectedMember) {
+      setSelectedMember(elderMembers[0].id);
+    } else if (familyMembers?.length && !selectedMember) {
+      setSelectedMember(familyMembers[0].id);
     }
-  }, [familyMembers, selectedMember]);
+  }, [elderMembers, familyMembers, selectedMember]);
 
   // Fetch chewing data for selected member
   const { data: chewingData, isLoading: loadingChewingData } = useQuery({
@@ -64,8 +75,6 @@ const Dashboard = () => {
       
       // Process the data to organize by date and time
       const processedData = (data as ChewingData[]).map(item => {
-        // If there's a timestamp field, we would use that to extract time
-        // Since we don't have that in the current schema, we'll just use the count
         return {
           ...item,
           // Format the date for display
@@ -126,7 +135,7 @@ const Dashboard = () => {
             <p className="text-muted-foreground">Track chewing metrics and health data</p>
           </div>
 
-          {!loadingMembers && familyMembers?.length > 0 && (
+          {!loadingMembers && (
             <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
               <Select 
                 value={selectedMember || undefined} 
@@ -136,33 +145,22 @@ const Dashboard = () => {
                   <SelectValue placeholder="Select family member" />
                 </SelectTrigger>
                 <SelectContent>
-                  {/* Highlight Elder person */}
-                  {familyMembers
-                    .filter(member => 
-                      member.relationship.toLowerCase() === 'elder' || 
-                      member.relationship.toLowerCase() === 'elderly' || 
-                      member.relationship.toLowerCase() === 'older adult'
-                    )
-                    .map((member) => (
-                      <SelectItem key={member.id} value={member.id} className="font-medium">
-                        {member.name} ({member.relationship}) ⭐
-                      </SelectItem>
-                    ))
-                  }
-                  <hr className="my-2 border-gray-300" />
-                  {/* Other family members */}
-                  {familyMembers
-                    .filter(member => 
-                      member.relationship.toLowerCase() !== 'elder' && 
-                      member.relationship.toLowerCase() !== 'elderly' && 
-                      member.relationship.toLowerCase() !== 'older adult'
-                    )
-                    .map((member) => (
-                      <SelectItem key={member.id} value={member.id}>
-                        {member.name} ({member.relationship})
-                      </SelectItem>
-                    ))
-                  }
+                  {/* All family members in dropdown */}
+                  {familyMembers?.map((member) => (
+                    <SelectItem 
+                      key={member.id} 
+                      value={member.id}
+                      className={member.relationship.toLowerCase() === 'elder' || 
+                               member.relationship.toLowerCase() === 'elderly' || 
+                               member.relationship.toLowerCase() === 'older adult' 
+                               ? "font-medium" : ""}
+                    >
+                      {member.name} ({member.relationship})
+                      {(member.relationship.toLowerCase() === 'elder' || 
+                        member.relationship.toLowerCase() === 'elderly' || 
+                        member.relationship.toLowerCase() === 'older adult') && " ⭐"}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
 
@@ -183,61 +181,40 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* Family Members Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {loadingMembers ? (
-            <Card className="col-span-full animate-pulse">
-              <CardHeader>
-                <div className="h-4 bg-slate-200 rounded w-3/4"></div>
-                <div className="h-3 bg-slate-200 rounded w-1/2"></div>
-              </CardHeader>
-              <CardContent>
-                <div className="h-20 bg-slate-200 rounded"></div>
-              </CardContent>
-            </Card>
-          ) : (
-            familyMembers?.map((member) => (
-              <Card 
-                key={member.id}
-                className={`cursor-pointer transition-all ${
-                  selectedMember === member.id ? 'ring-2 ring-solarpunk-leaf' : ''
-                } ${
-                  member.relationship.toLowerCase() === 'elder' ||
-                  member.relationship.toLowerCase() === 'elderly' ||
-                  member.relationship.toLowerCase() === 'older adult'
-                    ? 'border-solarpunk-leaf border-2' : ''
-                }`}
-                onClick={() => setSelectedMember(member.id)}
-              >
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">
-                    <div className="flex items-center gap-3">
-                      <Avatar>
-                        <AvatarImage src={member.avatar_url || ''} alt={member.name} />
-                        <AvatarFallback className={`${
-                          member.relationship.toLowerCase() === 'elder' ||
-                          member.relationship.toLowerCase() === 'elderly' ||
-                          member.relationship.toLowerCase() === 'older adult'
-                            ? 'bg-solarpunk-leaf text-white' 
-                            : 'bg-solarpunk-seafoam text-solarpunk-night'
-                        }`}>
-                          {member.name.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                      {member.name}
-                      {(member.relationship.toLowerCase() === 'elder' || 
-                        member.relationship.toLowerCase() === 'elderly' || 
-                        member.relationship.toLowerCase() === 'older adult') && 
-                        <span className="text-xs px-2 py-1 bg-solarpunk-leaf text-white rounded-full">Elder</span>
-                      }
-                    </div>
-                  </CardTitle>
-                  <CardDescription>{member.relationship}</CardDescription>
-                </CardHeader>
-              </Card>
-            ))
-          )}
-        </div>
+        {/* Elder Persons Navigation Section */}
+        {!loadingMembers && elderMembers.length > 0 && (
+          <div className="mb-6">
+            <h2 className="text-lg font-medium text-solarpunk-night mb-3">Elder Dashboard</h2>
+            <div className="flex flex-wrap gap-4">
+              {elderMembers.map((elder) => (
+                <Card 
+                  key={elder.id}
+                  className={`cursor-pointer transition-all w-full sm:w-64 ${
+                    selectedMember === elder.id ? 'ring-2 ring-solarpunk-leaf bg-solarpunk-seafoam/10' : ''
+                  } border-solarpunk-leaf border-2`}
+                  onClick={() => setSelectedMember(elder.id)}
+                >
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg">
+                      <div className="flex items-center gap-3">
+                        <Avatar>
+                          <AvatarImage src={elder.avatar_url || ''} alt={elder.name} />
+                          <AvatarFallback className="bg-solarpunk-leaf text-white">
+                            {elder.name.charAt(0)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          {elder.name}
+                          <span className="text-xs ml-2 px-2 py-1 bg-solarpunk-leaf text-white rounded-full">Elder</span>
+                        </div>
+                      </div>
+                    </CardTitle>
+                  </CardHeader>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Chewing Data Chart */}
         <Card>
