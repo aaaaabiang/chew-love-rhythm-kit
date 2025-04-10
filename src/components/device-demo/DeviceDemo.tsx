@@ -67,19 +67,13 @@ const DeviceDemo = () => {
           <FamilyMember isChewing={familyChewing} />
           
           {/* Connection Visualization */}
-<<<<<<< HEAD
-          <div className="flex justify-center">
             <ConnectionVisualizer 
-=======
-            <ConnectionVisualizer 
->>>>>>> 557f0e8619584e5a9e7d8d0691960f20ebb9701e
             connected={connected} 
             familyIsChewing={familyChewing}
             elderIsChewing={elderChewing} 
             resonanceStrength={resonanceStrength}
             toggleConnection={toggleConnection} 
           />
-          </div>
           
           
           {/* Elder Side */}
@@ -89,7 +83,7 @@ const DeviceDemo = () => {
               familyIsChewing={familyChewing}
               resonanceStrength={resonanceStrength}
             />
-        </div>
+            </div>
         
         {/* Description Text */}
         <InfoSection />
