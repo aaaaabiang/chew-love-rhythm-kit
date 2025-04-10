@@ -9,7 +9,128 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      chewing_data: {
+        Row: {
+          count: number
+          created_at: string | null
+          date: string
+          family_member_id: string
+          id: string
+        }
+        Insert: {
+          count?: number
+          created_at?: string | null
+          date?: string
+          family_member_id: string
+          id?: string
+        }
+        Update: {
+          count?: number
+          created_at?: string | null
+          date?: string
+          family_member_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chewing_data_family_member_id_fkey"
+            columns: ["family_member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      device_assignments: {
+        Row: {
+          assigned_at: string | null
+          created_at: string | null
+          device_id: string
+          family_member_id: string
+          id: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          created_at?: string | null
+          device_id: string
+          family_member_id: string
+          id?: string
+        }
+        Update: {
+          assigned_at?: string | null
+          created_at?: string | null
+          device_id?: string
+          family_member_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "device_assignments_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "devices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "device_assignments_family_member_id_fkey"
+            columns: ["family_member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      devices: {
+        Row: {
+          binding_time: string | null
+          created_at: string | null
+          id: string
+          name: string
+          status: string
+        }
+        Insert: {
+          binding_time?: string | null
+          created_at?: string | null
+          id?: string
+          name: string
+          status?: string
+        }
+        Update: {
+          binding_time?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      family_members: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          id: string
+          name: string
+          relationship: string
+          user_id: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          id?: string
+          name: string
+          relationship: string
+          user_id?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          relationship?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
