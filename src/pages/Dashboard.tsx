@@ -258,7 +258,7 @@ const Dashboard = () => {
               <div className="h-96 w-full"> {/* Increased height for better visualization */}
                 <ChartContainer
                   config={getChartConfig()}
-                  className="w-full aspect-[3/2]" {/* Control aspect ratio for better fit */}
+                  className="w-full aspect-[3/2]" /* Control aspect ratio for better fit */
                 >
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart
