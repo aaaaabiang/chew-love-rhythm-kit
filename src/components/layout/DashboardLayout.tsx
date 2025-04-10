@@ -13,7 +13,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   
   const navItems = [
     { label: 'Home', icon: Home, path: '/' },
-    { label: 'Dashboard', icon: BarChart3, path: '/dashboard' },
+    { label: 'Dashboard', icon: BarChart3, path: '/dashboard', primary: true },
     { label: 'Admin', icon: Settings, path: '/admin' },
   ];
 
@@ -34,7 +34,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                   className={
                     location.pathname === item.path 
                       ? "bg-solarpunk-leaf hover:bg-solarpunk-moss text-white" 
-                      : ""
+                      : item.primary ? "text-solarpunk-leaf font-medium" : ""
                   }
                   asChild
                 >

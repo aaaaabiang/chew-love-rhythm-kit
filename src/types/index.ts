@@ -29,4 +29,6 @@ export interface ChewingData {
   date: string;
   count: number;
   created_at: string;
+  formattedDate?: string; // Added for UI display formatting
+  timeOfDay?: string; // Could be used for future time-based organization
 }
