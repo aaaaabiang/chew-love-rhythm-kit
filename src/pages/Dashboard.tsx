@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -137,7 +136,7 @@ const Dashboard = () => {
                   <SelectValue placeholder="Select family member" />
                 </SelectTrigger>
                 <SelectContent>
-                  {/* First list elderly members */}
+                  {/* Highlight Elder person */}
                   {familyMembers
                     .filter(member => 
                       member.relationship.toLowerCase() === 'elder' || 
@@ -150,7 +149,8 @@ const Dashboard = () => {
                       </SelectItem>
                     ))
                   }
-                  {/* Then list other members */}
+                  <hr className="my-2 border-gray-300" />
+                  {/* Other family members */}
                   {familyMembers
                     .filter(member => 
                       member.relationship.toLowerCase() !== 'elder' && 
@@ -255,10 +255,10 @@ const Dashboard = () => {
             {loadingChewingData ? (
               <div className="h-96 bg-slate-100 animate-pulse rounded"></div>
             ) : chartData.length > 0 ? (
-              <div className="h-96 w-full"> {/* Increased height for better visualization */}
+              <div className="h-[400px] w-full"> {/* Adjusted height for better visualization */}
                 <ChartContainer
                   config={getChartConfig()}
-                  className="w-full aspect-[3/2]" /* Control aspect ratio for better fit */
+                  className="w-full aspect-[16/9]" /* Wider aspect ratio for better fit */
                 >
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart
