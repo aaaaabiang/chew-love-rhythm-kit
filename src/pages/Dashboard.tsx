@@ -255,52 +255,47 @@ const Dashboard = () => {
             {loadingChewingData ? (
               <div className="h-96 bg-slate-100 animate-pulse rounded"></div>
             ) : chartData.length > 0 ? (
-              <div className="h-[400px] w-full"> {/* Adjusted height for better visualization */}
-                <ChartContainer
-                  config={getChartConfig()}
-                  className="w-full aspect-[16/9]" /* Wider aspect ratio for better fit */
-                >
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart
-                      data={chartData}
-                      margin={{ top: 20, right: 30, bottom: 30, left: 20 }}
-                    >
-                      <defs>
-                        <linearGradient id="colorChewing" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#7FB069" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="#7FB069" stopOpacity={0.1}/>
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                      <XAxis 
-                        dataKey="date" 
-                        stroke="#6B7280"
-                        tick={{ fontSize: 12 }}
-                        tickMargin={10}
-                      />
-                      <YAxis 
-                        stroke="#6B7280"
-                        tick={{ fontSize: 12 }}
-                      />
-                      <ChartTooltip 
-                        content={
-                          <ChartTooltipContent 
-                            labelClassName="font-medium text-solarpunk-night" 
-                            indicator="dot" 
-                          />
-                        }
-                      />
-                      <Area 
-                        type="monotone" 
-                        dataKey="count" 
-                        name="chewing" 
-                        stroke="#7FB069" 
-                        fillOpacity={1} 
-                        fill="url(#colorChewing)" 
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
+              <div className="h-[500px] w-full overflow-hidden p-4"> {/* 确保父容器有明确的高度和宽度 */}
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart
+                    data={chartData}
+                    margin={{ top: 20, right: 30, bottom: 30, left: 20 }}
+                  >
+                    <defs>
+                      <linearGradient id="colorChewing" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#7FB069" stopOpacity={0.8} />
+                        <stop offset="95%" stopColor="#7FB069" stopOpacity={0.1} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                    <XAxis
+                      dataKey="date"
+                      stroke="#6B7280"
+                      tick={{ fontSize: 12 }}
+                      tickMargin={10}
+                    />
+                    <YAxis
+                      stroke="#6B7280"
+                      tick={{ fontSize: 12 }}
+                    />
+                    <ChartTooltip
+                      content={
+                        <ChartTooltipContent
+                          labelClassName="font-medium text-solarpunk-night"
+                          indicator="dot"
+                        />
+                      }
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="count"
+                      name="chewing"
+                      stroke="#7FB069"
+                      fillOpacity={1}
+                      fill="url(#colorChewing)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
               </div>
             ) : (
               <div className="h-80 flex items-center justify-center text-muted-foreground">
